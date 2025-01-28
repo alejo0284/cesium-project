@@ -1,95 +1,98 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
-    />
-    <meta name="description" content="Use Viewer to start building new applications or easily embed Cesium into existing applications.">
-    <meta name="cesium-sandcastle-labels" content="Beginner, Showcases">
-    <title>Cesium Demo</title>
-    <script type="text/javascript" src="../Sandcastle-header.js"></script>
-    <script src="../CesiumUnminified/Cesium.js"></script>
-    <script>window.CESIUM_BASE_URL = "../CesiumUnminified/";</script>
-  </head>
-  <body
-    class="sandcastle-loading"
-    data-sandcastle-bucket="bucket-requirejs.html"
-  >
-<style>
-  @import url(../templates/bucket.css);
-</style>
-<div id="cesiumContainer" class="fullSize"></div>
-<div id="loadingOverlay">
-  <h1>Loading...</h1>
-</div>
-<div id="toolbar"></div>
-<script id="cesium_sandcastle_script">
-window.startup = async function (Cesium) {
-    'use strict';
-//Sandcastle_Begin
-// Grant CesiumJS access to your Ion assets
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyYjkyNjU1Yy1hNTA2LTRmNmUtOWEwNy1mMzYwY2ViYzI2MTAiLCJpZCI6MTM2NDkyLCJpYXQiOjE2ODMxMDEwNDh9.c9-m3fuzTzzMPv-ofiYwBceMDF2V5J5guzQSGnLikKI";
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CesiumJS Viewer</title>
+  
+  <!-- Link CesiumJS Widgets CSS -->
+  <link href="Cesium/Widgets/widgets.css" rel="stylesheet">
+  
+  <!-- Load CesiumJS -->
+  <script src="Cesium/Cesium.js"></script>
+  
+  <style>
+    /* Basic styles for the Cesium container */
+    html, body, #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #loadingOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- The Cesium Container -->
+  <div id="cesiumContainer"></div>
+  <div id="loadingOverlay">Loading...</div>
+  
+  <script>
+    // Grant CesiumJS access to your Ion assets
+    Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyYjkyNjU1Yy1hNTA2LTRmNmUtOWEwNy1mMzYwY2ViYzI2MTAiLCJpZCI6MTM2NDkyLCJpYXQiOjE2ODMxMDEwNDh9.c9-m3fuzTzzMPv-ofiYwBceMDF2V5J5guzQSGnLikKI";
 
-// Initialize the viewer
-const viewer = new Cesium.Viewer("cesiumContainer", {
-  terrain: Cesium.Terrain.fromWorldTerrain(),
-  scene3DOnly: true,
-  navigationHelpButton: false,
-  sceneModePicker: false,
-});
-
-// Enable terrain transparency
-viewer.scene.globe.translucency.enabled = true;
-viewer.scene.globe.translucency.frontFaceAlphaByDistance = new Cesium.NearFarScalar(
-  1000.0, 0.5,
-  10000.0, 0.9
-);
-
-// Configure the screen space camera controller for collision-free zoom
-viewer.scene.screenSpaceCameraController.enableCollisionDetection = false;
-
-// Load the point cloud and GeoJSON data
-(async function () {
-  try {
-    // Load the point cloud
-    const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(2993304); // Point cloud asset ID
-    viewer.scene.primitives.add(tileset);
-
-    // Zoom to the point cloud (no zoom for GeoJSON to avoid conflict)
-    await viewer.zoomTo(tileset);
-
-    // Apply styling to the point cloud
-    tileset.style = new Cesium.Cesium3DTileStyle({
-      pointSize: 6, // Adjust point size
+    // Initialize the Cesium viewer
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      terrain: Cesium.Terrain.fromWorldTerrain(),
+      scene3DOnly: true,
+      navigationHelpButton: false,
+      sceneModePicker: false,
     });
 
-    console.log("Point cloud loaded and styled successfully.");
+    // Enable terrain transparency
+    viewer.scene.globe.translucency.enabled = true;
+    viewer.scene.globe.translucency.frontFaceAlphaByDistance = new Cesium.NearFarScalar(
+      1000.0, 0.5,
+      10000.0, 0.9
+    );
 
-    // Load the GeoJSON from Cesium Ion
-    const resource = await Cesium.IonResource.fromAssetId(3001718); // GeoJSON asset ID
-    const dataSource = await Cesium.GeoJsonDataSource.load(resource);
+    // Configure the screen space camera controller for collision-free zoom
+    viewer.scene.screenSpaceCameraController.enableCollisionDetection = false;
 
-    // Add the GeoJSON to the viewer
-    viewer.dataSources.add(dataSource);
+    // Load the point cloud and GeoJSON data
+    (async function () {
+      try {
+        // Load the point cloud
+        const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(2993304); // Point cloud asset ID
+        viewer.scene.primitives.add(tileset);
 
-    console.log("GeoJSON loaded successfully.");
+        // Zoom to the point cloud
+        await viewer.zoomTo(tileset);
 
-  } catch (error) {
-    console.error("Error loading assets:", error);
-  }
-})();//Sandcastle_End
-    Sandcastle.finishedLoading();
-};
-if (typeof Cesium !== 'undefined') {
-    window.startupCalled = true;
-    window.startup(Cesium).catch((error) => {
-      "use strict";
-      console.error(error);
-    });
-}
-</script>
+        // Apply styling to the point cloud
+        tileset.style = new Cesium.Cesium3DTileStyle({
+          pointSize: 6, // Adjust point size
+        });
+
+        console.log("Point cloud loaded and styled successfully.");
+
+        // Load the GeoJSON from Cesium Ion
+        const resource = await Cesium.IonResource.fromAssetId(3001718); // GeoJSON asset ID
+        const dataSource = await Cesium.GeoJsonDataSource.load(resource);
+
+        // Add the GeoJSON to the viewer
+        viewer.dataSources.add(dataSource);
+
+        console.log("GeoJSON loaded successfully.");
+
+      } catch (error) {
+        console.error("Error loading assets:", error);
+      }
+    })();
+  </script>
 </body>
 </html>
+
